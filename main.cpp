@@ -13,6 +13,6 @@ int main() {
     generator.generate(ce, "output.owl");
 
     std::cout << "✅ OwlLang 模型生成成功，文件已写入 output.owl" << std::endl;
-    std::cout <<"test sucess";
+    std::cout <<"test";
     return 0;
 }
