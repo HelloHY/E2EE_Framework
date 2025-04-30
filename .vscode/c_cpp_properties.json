@@ -1,0 +1,25 @@
+{
+  "configurations": [
+      {
+          "name": "windows-gcc-x64",
+          "includePath": [
+              "${workspaceFolder}/**",  // 包括项目根目录下的所有头文件
+              "${workspaceFolder}/include"  // 确保包含头文件目录
+          ],
+          "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",  // 使用 g++ 编译器来编译 C++ 项目
+          "cStandard": "c11",
+          "cppStandard": "c++17",  // 可以根据需要设置合适的 C++ 标准
+          "intelliSenseMode": "windows-gcc-x64",
+          "compilerArgs": [],
+          "defines": [],
+          "browse": {
+              "path": [
+                  "${workspaceFolder}/src",  // 添加源文件路径供 IntelliSense 使用
+                  "${workspaceFolder}/include"  // 确保 IntelliSense 能够找到头文件
+              ],
+              "limitSymbolsToIncludedHeaders": true
+          }
+      }
+  ],
+  "version": 4
+}

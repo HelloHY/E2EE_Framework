@@ -1,0 +1,29 @@
+//attcak modekle
+modle1
+
+//roles
+A B
+Server
+
+//DH keys
+A:={IK SPK EK}	
+B:={IK SPK EK}	
+
+//Signature keys
+B:={skB}
+
+//dh_hash
+l:={SS}
+
+//dr_hash
+k
+
+//parameters
+A:={ctxt x}
+
+
+//message
+A:={AsendMSG(x)} 	
+B:={BuploadPKs(y)} 	
+Server:={A2S_followup_message() S2B_followup_message()}
+ 
