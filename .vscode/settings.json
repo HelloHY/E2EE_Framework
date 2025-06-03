@@ -112,6 +112,11 @@
     "streambuf": "cpp",
     "text_encoding": "cpp",
     "typeinfo": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "filesystem": "cpp",
+    "set": "cpp",
+    "bitset": "cpp",
+    "regex": "cpp",
+    "unordered_set": "cpp"
   }
 }

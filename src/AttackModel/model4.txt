@@ -1,0 +1,85 @@
+//消息伪造和重排
+locality A 
+locality B 
+//server locality
+
+
+//userID
+
+
+name x1 : nonce @A
+name x2 : nonce @A
+//x_corr
+corr adv ==> [x_corr]
+
+name SK1: enckey Name(x1) @A,B
+name SK2: enckey Name(x2) @A,B
+
+//time
+corr adv ==> [time1]
+corr adv ==> [time2]
+
+////***********definite message struct***********////
+struct A2S_MSG1{
+    _accept_userID1:Data<adv> ||nonce||,
+    _accept_enc_x1:Data<adv>,
+    _Atime1: Data<adv> ||nonce||
+}
+struct A2S_MSG2{
+    _accept_userID2:Data<adv> ||nonce||,
+    _accept_enc_x2:Data<adv>,
+    _Atime2: Data<adv> ||nonce||
+}
+
+struct S2B_MSG1{
+    _sender_userID1:Data<adv> ||nonce||,
+    _sender_enc_x1:Data<adv>,
+    _Btime1: Data<adv> ||nonce||
+}
+struct S2B_MSG2{
+    _sender_userID2:Data<adv> ||nonce||,
+    _sender_enc_x2:Name(x_corr),
+    _Btime2: Data<adv> ||nonce||
+}
+
+enum Result {
+    | Ok_Server_replace_time
+    | No
+}
+
+def A_send_MSG() @A
+requires corr(userA) /\ corr(userB) /\ corr(time1) /\ corr(time2)
+:Unit = 
+    let m1 = aenc(get(SK1),get(x1)) in
+    let m2 = aenc(get(SK2),get(x2)) in
+    //output A2S_MSG1 msg
+    ()
+
+
+def B_accept_MSG() @B 
+requires corr(time1) /\ corr(time2)
+:Result =
+    let SK1 = get(SK1) in
+    let SK2 = get(SK2) in
+
+    input MSG1fromServer in //(userA,x_corr,time1)
+    input MSG2fromServer in //(userA,x1,time2)
+    //检查时间戳
+    let t1 = _Btime1(MSG1fromServer) in 
+    let t2 = _Btime2(MSG2fromServer) in
+    let u1 = _sender_userID1(MSG1fromServer) in
+    let u2 = _sender_userID2(MSG2fromServer) in
+    pcase (u1 == get(userA)) in
+    pcase (u2 == get(userA)) in
+
+    if eq(t1, get(time1)) && eq(t2, get(time2)) then
+         debug printTyContext;
+            corr_case SK1 in
+            case adec(SK1,_sender_enc_x1(MSG2fromServer)) {//无法解密，因为是x_corr
+                |Some res =>
+                    let res : if sec(SK1) then Name(x1) else Data<adv> = x1 in
+                            Ok_Server_replace_time()
+                |None => ()
+            }
+    else 
+        No()

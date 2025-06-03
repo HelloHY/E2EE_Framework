@@ -1,0 +1,38 @@
+def Server_transfer_initial_message() @Server
+: Unit = 
+    input InitialMessage in
+    corr_case IK_sk_A in
+    case _ik_pk_A(InitialMessage) {
+        | Some A_ik_pk =>
+            let IK_pk_A = A_ik_pk in
+            corr_case EK_sk_A in
+            case _ek_pk_A(InitialMessage) {
+            | Some A_ek_pk =>
+                let EK_pk_A = A_ek_pk in
+                //Server transfer initial message
+                let _ = output InitialMessage to endpoint(B) in
+                ()
+            | None=> ()
+        }
+        | None => () 
+    }
+
+
+def Server_distinguish_keys () @Server
+: Unit =
+    input BuploadPKsFromB in    
+    corr_case IK_sk_B in
+    case _ik_pk_B(BuploadPKsFromB) {
+        | Some B_ik_pk => 
+            let IK_pk_B = B_ik_pk in
+            corr_case SPK_sk_B in
+            case _spk_pk_B(BuploadPKsFromB) {
+                | Some B_spk_pk =>
+                    let SPK_pk_B = B_spk_pk in
+                    //Server distinguish keys
+                    let _ = output BuploadPKsFromB to endpoint(A) in 
+                    call Server_transfer_initial_message()
+                | None => ()
+            }
+        | None => ()
+    }

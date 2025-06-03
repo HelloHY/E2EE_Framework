@@ -1,0 +1,109 @@
+//恶意服务器
+////***********Bob Process***********////
+
+def Bob_receive_followup_message() @B
+:Unit =
+    input S2B_followup_message_fromB in
+    let senderIDfromS = _sender_userID(S2B_followup_message_fromB) in
+    pcase (senderIDfromS == get(userA)) in     
+    //input S2B_followup_message_fromB msg
+
+    //get dr_keys
+    let followup_message = _sender_enc_x(S2B_followup_message_fromB) in
+    corr_case SK in
+    case adec(SK,followup_message) {
+        |Some res =>
+        //dr_hash check
+            ()
+        |None => ()
+    }
+
+def Bob_receive_key (IK_pk_B : dhpk(IK_sk_B)) @B
+//requires Bob_receive_key corr
+: Unit =
+    input InitialMessageFromServer in  
+    let IK_pk_A = _ik_pk_A(InitialMessageFromServer) in
+    let EK_pk_A = _ek_pk_A(InitialMessageFromServer) in
+    let enc_msg = _enc_msg(InitialMessageFromServer) in
+    let adFromA = _ad(InitialMessageFromServer) in
+    //input InitialMessageFromServer msg
+    
+    let BcaculateAD = IK_pk_A ++ IK_pk_B in
+    pcase(BcaculateAD == adFromA) in 
+
+    corr_case IK_sk_A in
+    corr_case EK_sk_A in
+    corr_case IK_sk_B in
+    corr_case SPK_sk_B in
+    corr_case ctxt in
+    //Bob calculate shared secret
+    let S = concat(dh_combine(get(IK_sk_B),EK_pk_A),concat(dh_combine(get(SPK_sk_B),IK_pk_A),dh_combine(get(SPK_sk_B),EK_pk_A))) in
+    debug printTyContext;
+    //pcase shared secret
+    pcase (S == dh_combine(get(IK_sk_B),dhpk(get(EK_sk_A))) ++ dh_combine(get(SPK_sk_B),dhpk(get(IK_sk_A))) ++ dh_combine(get(SPK_sk_B),dhpk(get(EK_sk_A)))) in
+
+    debug printTyContext;
+    call Bob_receive_followup_message()
+
+def Bob_Publishing_Key () @B
+//requires Bob_Publishing_Key corr   
+: Unit =
+    let IK_pk_B = dhpk(get(IK_sk_B)) in
+    let SPK_pk_B = dhpk(get(SPK_sk_B)) in
+    let sign_spk_pk_B = sign(get(IK_sk_B),SPK_pk_B) in
+    debug printTyContext;
+    //BuploadPKs msg
+    //output BuploadPKs msg
+    call Bob_receive_key(IK_pk_B)
+
+////***********Alice Process***********////
+
+def Alice_send_followup_message() @A
+//requires Alice_send_followup_message corr
+: Unit =
+    //get dr_keys
+    let x = get(x) in
+    let accept_userID = get(userB) in
+    let accept_enc_x = aenc(SK,x) in
+    //Alice_send_followup_message msg
+
+    debug printTyContext;
+    false_elim in
+   //output Alice_send_followup_message msg
+    ()
+
+def Alice_Accquire_Key () @A
+//requires Alice_Accquire_Key corr
+: Unit =
+    input BPKsFromServer in
+    let IK_pk_B = _ik_pk_B(BPKsFromServer) in
+    let SPK_pk_B = _spk_pk_B(BPKsFromServer) in
+    let signPKs = _sign_spk_pk_B(BPKsFromServer) in
+    let vkB : vk(skB) = get_vk(skB) in
+    //input BPKsFromServer msg
+
+//verify signature
+    corr_case skB in
+    case vrfy(vkB,signPKs,SPK_pk_B) {
+        | Some bobs_pk =>       //should be SPK_pk_B
+            //other ops
+            corr_case IK_sk_A in
+            corr_case EK_sk_A in
+            corr_case IK_sk_B in
+            corr_case SPK_sk_B in
+            corr_case ctxt in
+            //Alice calculate shared secret
+            let S = concat(dh_combine(get(IK_sk_A),bobs_pk), concat(dh_combine(get(EK_sk_A),IK_pk_B),dh_combine(get(EK_sk_A),bobs_pk))) in
+            let SK = hash<l;0>(S) in
+            let SK_init = get(SK_init) in
+
+            let IK_pk_A = dhpk(get(IK_sk_A)) in
+            let AD = concat(IK_pk_A,IK_pk_B) in
+            debug printTyContext;
+            let _enc_msg = aenc(SK_init,get(ctxt)) in
+            //output AsendMSG msg
+            call Alice_send_followup_message()
+            //end other ops
+        | None => ()
+    }
+

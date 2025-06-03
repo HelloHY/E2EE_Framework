@@ -1,0 +1,19 @@
+
+
+def Server_transfer_MSG() @Server
+requires corr(x_corr) /\ corr(userA)
+:Unit =
+    input MSG1fromA in
+    let t1 = _Atime1(MSG1fromA) in  //time1
+    let u1 = _accept_userID1(MSG1fromA) in
+    let x1 = _accept_enc_x1(MSG1fromA) in   //x1
+
+    input MSG2fromA in
+    let t2 = _Atime2(MSG2fromA) in   //time2
+    let u2 = _accept_userID2(MSG2fromA) in
+    let x2 = _accept_enc_x2(MSG2fromA) in   //x2
+    
+    if eq(length(u1), |nonce|) && eq(length(u2), |nonce|) then
+        //output MSG1&MSG2
+        ()
+    else ()

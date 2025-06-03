@@ -1,6 +1,3 @@
-//attcak modekle
-modle1
-
 //roles
 A B
 Server
@@ -10,20 +7,33 @@ A:={IK SPK EK}
 B:={IK SPK EK}	
 
 //Signature keys
-B:={skB}
+B:={skB(SPK_sk_B:DH)}
 
 //dh_hash
-l:={SS}
+l:={}
 
 //dr_hash
-k
+
 
 //parameters
-A:={ctxt x}
+A:={}
+B:={}
 
+//corr
 
-//message
-A:={AsendMSG(x)} 	
-B:={BuploadPKs(y)} 	
+A:={AsendMSG()} 	
+B:={BuploadPKs()} 	
 Server:={A2S_followup_message() S2B_followup_message()}
- 
+
+//attack model
+model4
+
+//attack model server
+server3
+
+//process operations
+Bob_receive_followup_message:={}
+Bob_receive_key:={}
+Bob_Publishing_Key:={}
+Alice_send_followup_message:={}
+Alice_Accquire_Key:={}

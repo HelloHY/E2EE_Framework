@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 
 // CoreElement 类声明
 class CoreElement {
@@ -18,16 +19,13 @@ public:
     std::map<std::string, std::vector<std::string>> dh_keys;
 
     // Signature keys
-    std::map<std::string, std::vector<std::string>> sig_keys;
+    std::unordered_map<std::string, std::vector<std::string>> sig_keys;
 
     // parameters
     std::map<std::string, std::vector<std::string>> parameters;
 
     // messages
     std::unordered_map<std::string, std::vector<std::string>> messages;
-
-    // 消息参数
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> messageParams;
 
     // dh_hash
     std::map<std::string, std::string> dh_hash;
@@ -40,6 +38,18 @@ public:
 
     // 生成 dh_hash 的输出格式
     std::string generate_dh_hash_output(const std::string& l_value) const;
+
+    std::string model_type; //存储modle attack
+
+    std::string server_type;//存储server type
+
+    std::unordered_map<std::string, std::vector<std::string>> process;
+
+    std::vector<std::pair<std::string, std::vector<std::string>>> corr_rule;//存储corr规则
+
+    const std::unordered_set<std::string> known_keywords = {
+        "IK_sk_B", "SPK_sk_B", "EK_sk_A", "ctxt", "SK", "skB", "SK_init"
+    };
 };
 
 class CoreElementParser {
